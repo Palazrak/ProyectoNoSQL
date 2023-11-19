@@ -1,0 +1,16 @@
+version: "3.1"
+services:
+  lake:
+    image: mongo
+    container_name: mongo_lake
+    ports:
+      - "27017:27017"
+  scrapper:
+    container_name: python_scrapper
+    build:
+      context: ./
+      dockerfile: Dockerfile.venv 
+    env_file:
+      - .env
+    depends_on:
+      - lake
