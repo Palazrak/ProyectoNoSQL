@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # Copia el codigo de python al contenedor
-COPY coctails_data.py .
+COPY cocktails_data.py .
 
 # Define el comando por defecto para ejecutar la aplicación
-CMD sleep 30 && python coctails_data.py
+CMD sleep 30 && python cocktails_data.py
