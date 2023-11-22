@@ -13,7 +13,6 @@ client = pymongo.MongoClient("mongodb://mongo_lake:27017")
 db = client["cocktails"]
 collection_formatted = db["drinks"]
 collection_raw = db["raw"]
-collection_ingredients = db["ingredients"]
 
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'v', 'w', 'y', 'z']
 for letter in letters:
@@ -70,8 +69,18 @@ for letter in letters:
         collection_formatted.insert_one(clean_drink)
 
 # Ahora crearé una colección para guardar los ingredientes
+collection_ingredients = db["ingredients"]
 url_ingredients = f"https://www.thecocktaildb.com/api/json/v2/{API_KEY}/list.php?i=list"
 response_ingredients = requests.get(url_ingredients).json()
 
 for ingredient in response_ingredients["drinks"]:
     collection_ingredients.insert_one(ingredient)
+    
+# Por último, guardar una colección adicional de "most popular drinks". Esto servirá para el Cassandra
+
+collection_popular_drinks = db["popular_drinks"]
+url_popular_drinks = f"www.thecocktaildb.com/api/json/v2/{API_KEY}/popular.php"
+response_popular_drinks = response_ingredients = requests.get(url_popular_drinks).json()
+
+for drink in response_popular_drinks["drinks"]:
+    collection_popular_drinks.insert_one(drink)
