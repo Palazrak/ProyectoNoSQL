@@ -78,9 +78,10 @@ for ingredient in response_ingredients["drinks"]:
     
 # Por último, guardar una colección adicional de "most popular drinks". Esto servirá para el Cassandra
 
-collection_popular_drinks = db["popular_drinks"]
-url_popular_drinks = f"www.thecocktaildb.com/api/json/v2/{API_KEY}/popular.php"
-response_popular_drinks = response_ingredients = requests.get(url_popular_drinks).json()
+collection_popular = db["popular_drinks"]
+url_popular_drinks = f"https://www.thecocktaildb.com/api/json/v2/{API_KEY}/popular.php"
+response_popular = requests.get(url_popular_drinks).json()
 
-for drink in response_popular_drinks["drinks"]:
-    collection_popular_drinks.insert_one(drink)
+for drink in response_popular["drinks"]:
+    collection_popular.insert_one(drink)
+    
