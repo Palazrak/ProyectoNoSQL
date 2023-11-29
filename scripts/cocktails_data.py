@@ -84,4 +84,3 @@ response_popular = requests.get(url_popular_drinks).json()
 
 for drink in response_popular["drinks"]:
     collection_popular.insert_one(drink)
-    

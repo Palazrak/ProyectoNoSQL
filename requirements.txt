@@ -1,3 +1,5 @@
 requests
 pymongo
+neo4j
+cassandra-driver
 python-dotenv
