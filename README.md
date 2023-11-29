@@ -130,6 +130,23 @@ use cocktails
 
 ### Consultas al Mongo
 
+1. Obtener las instrucciones de como preparar las 20 bebidas más importantes
+    ```javascript
+    db.popular_drinks.find({},{'_id':0, 'idDrink':1, 'strDrink':1, 'strInstructions':1})
+    ```
+2. ¿Cuáles son las bebidas que contienen mayor número de ingredientes distintos?
+    ```javascript
+    
+    ```
+3. ¿Cuáles son los diferentes tipos de Mojitos que hay en la base de datos?
+    ```javascript
+    db.drinks.find({'strDrink':/^Mojito/})
+    ```
+4. Obtener la informacion de las bebidas que comiencen con una letra dada
+    ```javascript
+    db.drinks.find({'strDrink':/^D/})
+    ```
+
 ## Cassandra
 
 Dentro del cassandra creamos dos tablas en el mismo keyspace:
@@ -157,6 +174,45 @@ use cocktails;
 ```
 
 ### Consultas al Cassandra 
+
+1. Información de las 20 bebidas mas populares según la API
+    ```
+    SELECT * FROM popular_drinks
+    ```
+2. ¿Cuántas bebidas hay que sean de categoría 'Cocktail'?
+    ```
+    SELECT COUNT(*) as count
+    FROM drinks
+    WHERE strcategory = 'Cocktail'
+    ALLOW FILTERING;
+    ```
+3. ¿Cuántas bebidas hay que se sirvan en vaso de tipo 'Old-fashioned glass'?
+    ```
+    SELECT COUNT(*) as count
+    FROM drinks
+    WHERE strglass = 'Old-fashioned glass'
+    ALLOW FILTERING;
+    ```
+4. ¿Cuántas bebidas son alcohólicas, no alcohólias o contienen alcohol opcional?
+    ```
+    SELECT COUNT(*) as count
+    FROM drinks
+    WHERE stralcoholic = 'Alcoholic'
+    ALLOW FILTERING;
+    ```
+    ```
+    SELECT COUNT(*) as count
+    FROM drinks
+    WHERE stralcoholic = 'Optional alcohol'
+    ALLOW FILTERING;
+    ```
+    ```
+    SELECT COUNT(*) as count
+    FROM drinks
+    WHERE stralcoholic = 'Optional alcohol'
+    ALLOW FILTERING;
+    ```
+Las consultas anteriores podrían usarse con diferentes opciones de "strcategory" y "strglass". Para ver cuáles son todas las opciones, puede o hacerse una consulta gratuita a la API en la que se listen todas las opciones o se puede hacer un aggregate en el Mongo. 
 
 ## Neo4J
 
