@@ -46,7 +46,7 @@ Una vez hechas las consultas a la API de The Cocktail DB, insertamos los datos e
 Tomando esto en cuenta, la colección que tenemos planeado que sea utilizada es la colección "drinks", ya que las otras solo fueron utilizadas para la creación de las demás (no las eliminamos para demostrar que fue parte del proceso de creación).
 
 Aquí hay un ejemplo de cómo se guardan los elementos en la colección "drinks":
-```json
+```
 {
     _id: ObjectId("65584cb1247634a5a840c451"),
     idDrink: '17222',
@@ -96,7 +96,6 @@ Una vez hecho esto, es necesario activar la base de datos "cocktails".
 ```
 use cocktails
 ```
-Ahora sí, podemos empezar a usar el Mongo.
 
 ### Consultas al Mongo
 
@@ -125,7 +124,6 @@ Una vez hecho esto, es necesario activar el keyspace "cocktails".
 ```
 use cocktails;
 ```
-Ahora sí, podemos empezar a usar el Cassandra.
 
 ### Consultas al Cassandra 
 
