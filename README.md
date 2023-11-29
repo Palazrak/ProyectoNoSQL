@@ -104,7 +104,7 @@ Aquí hay un ejemplo de cómo se guardan los elementos en la colección "drinks"
     measures: [ '1 3/4 shot ', '1 Shot ', '1/4 Shot', '1/8 Shot' ]
 }
 ```
-Para cada elemento puede variar el contenido de "instructions", ya que no todas las bebidas contienen as instrucciones en todos los idiomas disponibles, los cuales pueden ser:
+Para cada elemento puede variar el contenido de "instructions", ya que no todas las bebidas contienen las instrucciones en todos los idiomas disponibles, los cuales pueden ser:
 - EN para Inglés
 - ES para Español
 - DE para Alemán
