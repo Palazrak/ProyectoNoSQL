@@ -181,7 +181,7 @@ use cocktails;
 
 1. Información de las 20 bebidas mas populares según la API
     ```
-    SELECT * FROM popular_drinks
+    SELECT * FROM popular_drinks;
     ```
 2. ¿Cuántas bebidas hay que sean de categoría 'Cocktail'?
     ```
