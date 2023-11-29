@@ -136,7 +136,11 @@ use cocktails
     ```
 2. ¿Cuáles son las bebidas que contienen mayor número de ingredientes distintos?
     ```javascript
-    
+    db.drinks.aggregate([
+        {$project: {_id: 1, strDrink: 1, ingredientCount: { $size: "$ingredients" }}},
+        {$sort: {ingredientCount: -1}},
+        {$limit: 10}
+    ])
     ```
 3. ¿Cuáles son los diferentes tipos de Mojitos que hay en la base de datos?
     ```javascript
