@@ -10,7 +10,7 @@ En este documento explicaremos un poco sobre el funcionamiento del proyecto, los
 
 ## Sobre la API utilizada: The Cocktail DB
 
-[The Coctail DB](https://www.thecocktaildb.com/) es una base de datos que contiene información sobre 621 bebidas de todo el mundo. A partir de su API obtuvimos la información sobre las 621 bebidas disponibles, cuáles de éstas son las más populares y una lista con todos los ingredientes disponibles. Estas consultas nos sirvieron para crear las tres bases de datos.
+[The Cocktail DB](https://www.thecocktaildb.com/) es una base de datos que contiene información sobre 621 bebidas de todo el mundo. A partir de su API obtuvimos la información sobre las 621 bebidas disponibles, cuáles de éstas son las más populares y una lista con todos los ingredientes disponibles. Estas consultas nos sirvieron para crear las tres bases de datos.
 
 A pesar de tener algunos servicios gratuitos, para tener acceso a toda la base de datos es necesario pagar una suscripción en Patreon; una vez pagada la suscripción, obtuvimos una llave privada para hacer solicitudes a la API, que manejamos como una variable de entorno en un archivo .env (por motivos de seguridad, no está contenido en este repositorio).
 
@@ -22,16 +22,47 @@ Para poder ejecutar el proyecto como es debido, es necesario seguir las siguient
 3. Descargar los 4 archivos .csv contenidos en el siguiente drive de google (Haz click [aquí](https://drive.google.com/drive/folders/1YGicWeAc83kDsr9gNXHlb2ak2bhZonGS?usp=sharing)) y **guardarlos en la carpeta "data" que viene en el repositorio**. Es importante guardar los .csv en esta carpeta porque si no están en esta ubicación, el proyecto no funcionará.
 4. Asegurate de que el daemon de docker esté corriendo.
 5. En la carpeta del repositorio, escribir el siguiente comando en la terminal:
-```bash
-docker compose up -d
-```
+    ```bash
+    docker compose up -d
+    ```
 6. Esperar alrededor de 2 minutos para garantizar que todo se cree correctamente.
 7. Comprobar que los contenedores estén corriendo con el siguiente comando:
-```bash
-docker ps
-```
+    ```bash
+    docker ps
+    ```
 
 Aquí podremos ver toda la información de los contenedores que están corriendo, principalmente los puertos que utilizan y los nombres de los contenedores.
+
+### Sobre los .csv utilizados: Cómo los generamos
+
+Los .csv que están en ese drive no aparecieron de la nada. Fueron creados en una etapa temprana del proyecto, en la que solo estaba implementada la funcionalidad del MongoDB.
+
+Para obtener los archivos, ésto fue lo que hicimos:
+1. Entramos al bash del contenedor de Mongo
+    ```
+    docker exec -it mongo_lake /bin/bash
+    ```
+2. Dentro del bash de Mongo, corrimos los siguientes 4 mongoexports:
+    ```
+    mongoexport --db cocktails --collection raw --type=csv --fields idDrink,strDrink,strCategory,strAlcoholic,strGlass --out /data/db/drinks.csv
+    mongoexport --db cocktails --collection popular_drinks --type=csv --fields idDrink,strDrink,strCategory,strAlcoholic,strGlass --out /data/db/popular_drinks.csv
+    mongoexport --db cocktails --collection ingredients --type=csv --fields strIngredient1 --out /data/db/ingredients.csv
+    mongoexport --db cocktails --collection drinks --type csv --fields strDrink,strCategory,strAlcoholic,strGlass,ingredients --out /data/db/drinks_filtered.csv
+    ```
+3. Salimos del bash de Mongo:
+    ```
+    exit
+    ```
+4. Fuera del bash de Mongo, corrimos los siguientes comandos:
+    ```
+    docker cp mongo_lake:/data/db/drinks.csv ./data
+    docker cp mongo_lake:/data/db/popular_drinks.csv ./data
+    docker cp mongo_lake:/data/db/ingredients.csv ./data
+    docker cp mongo_lake:/data/db/drinks_filtered.csv ./data
+    ```
+Esto guarda los csv en la carpeta "data" del repositorio, con los cuales, en la siguiente etapa del proyecto, construimos el Cassandra y el Neo4j. No incluímos los csv en el repositorio para que no fuera tan pesado (y por instrucción del profesor).
+
+Es importante recalcar que este procedimiento puede replicarse para comprobar que en efecto son los mismos .csv que se descargaron, pero para que el proyecto ejecute es necesario primero descargarlos a la carpeta "data". Ya después se puede jugar con generar los .csv y verificar que sean los mismos.
 
 Ahora sí, podemos entrar de lleno con el resto del proyecto.
 
@@ -146,28 +177,28 @@ Una vez dentro, podemos empezar a hacer nuestras consultas
 ### Consultas al Neo4j
 
 1. Encuentra todas las bebidas que contengan un ingrediente específico: 
-```
-MATCH (d:Drink)-[:CONTAINS]->(i:Ingredient {name: 'Gin'})
-RETURN d.name AS Drink
-```
+    ```
+    MATCH (d:Drink)-[:CONTAINS]->(i:Ingredient {name: 'Gin'})
+    RETURN d.name AS Drink
+    ```
 
 2. Listar todos los ingredientes que contiene una bebida específica:
-```
-MATCH (d:Drink {name: 'A1'})-[:CONTAINS]->(i:Ingredient)
-RETURN i.name AS Ingredient
-```
+    ```
+    MATCH (d:Drink {name: 'A1'})-[:CONTAINS]->(i:Ingredient)
+    RETURN i.name AS Ingredient
+    ```
 
 3. Encuentra a todas las bebidas y sus ingredientes:
-```
-MATCH (d:Drink)-[:CONTAINS]->(i:Ingredient)
-RETURN d.name AS Drink, collect(i.name) AS Ingredients
-ORDER BY d.name
-```
+    ```
+    MATCH (d:Drink)-[:CONTAINS]->(i:Ingredient)
+    RETURN d.name AS Drink, collect(i.name) AS Ingredients
+    ORDER BY d.name
+    ```
 
 4. Encuentra a los ingredientes más usados al preparar bebidas
-```
-MATCH (:Drink)-[:CONTAINS]->(i:Ingredient)
-RETURN i.name AS Ingredient, count(*) AS NumberOfDrinks
-ORDER BY NumberOfDrinks DESC
-LIMIT 10
-```
+    ```
+    MATCH (:Drink)-[:CONTAINS]->(i:Ingredient)
+    RETURN i.name AS Ingredient, count(*) AS NumberOfDrinks
+    ORDER BY NumberOfDrinks DESC
+    LIMIT 10
+    ```
