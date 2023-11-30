@@ -44,7 +44,7 @@ Para obtener los archivos, ésto fue lo que hicimos:
     ```
 2. Dentro del bash de Mongo, corrimos los siguientes 4 mongoexports:
     ```
-    mongoexport --db cocktails --collection raw --type=csv --fields idDrink,strDrink,strCategory,strAlcoholic,strGlass --out /data/db/drinks.csv
+    mongoexport --db cocktails --collection drinks --type=csv --fields idDrink,strDrink,strCategory,strAlcoholic,strGlass --out /data/db/drinks.csv
     mongoexport --db cocktails --collection popular_drinks --type=csv --fields idDrink,strDrink,strCategory,strAlcoholic,strGlass --out /data/db/popular_drinks.csv
     mongoexport --db cocktails --collection ingredients --type=csv --fields strIngredient1 --out /data/db/ingredients.csv
     mongoexport --db cocktails --collection drinks --type csv --fields strDrink,strCategory,strAlcoholic,strGlass,ingredients --out /data/db/drinks_filtered.csv
@@ -60,7 +60,7 @@ Para obtener los archivos, ésto fue lo que hicimos:
     docker cp mongo_lake:/data/db/ingredients.csv ./data
     docker cp mongo_lake:/data/db/drinks_filtered.csv ./data
     ```
-Esto guarda los csv en la carpeta "data" del repositorio, con los cuales, en la siguiente etapa del proyecto, construimos el Cassandra y el Neo4j. No incluímos los csv en el repositorio para que no fuera tan pesado (y por instrucción del profesor).
+Esto guarda los csv en la carpeta "data" del repositorio, con los cuales, en la siguiente etapa del proyecto, construimos el Cassandra y el Neo4j. No incluímos los .csv en el repositorio para que no fuera tan pesado (y por instrucción del profesor).
 
 Es importante recalcar que este procedimiento puede replicarse para comprobar que en efecto son los mismos .csv que se descargaron, pero para que el proyecto ejecute es necesario primero descargarlos a la carpeta "data". Ya después se puede jugar con generar los .csv y verificar que sean los mismos.
 
@@ -68,11 +68,10 @@ Ahora sí, podemos entrar de lleno con el resto del proyecto.
 
 ## MongoDB
 
-Una vez hechas las consultas a la API de The Cocktail DB, insertamos los datos en Mongo utilizando un script de Python. Al momento de guardar la información, creamos 4 colecciones:
-- Una llamada "raw", en la cual se guardaron los datos sin formato para facilitar la creacion de la base de datos en Cassandra
-- Una llamada "popular_drinks", en la cual se guardó la consulta de las bebidas más populares según la API. Los datos de esta colección tamibién se guardaron sin formato, por el mismo motivo que la coleccion "raw"
-- Una llamada "ingredients", que contiene todos los ingredientes disponibles en la API
+Una vez hechas las consultas a la API de The Cocktail DB, insertamos los datos en Mongo utilizando un script de Python. Al momento de guardar la información, creamos 3 colecciones:
 - Una llamada "drinks", en la cual se guardaron los elementos con un formato que facilitara la lectura en Mongo
+- Una llamada "popular_drinks", en la cual se guardó la consulta de las bebidas más populares según la API (en el mismo formato que "drinks")
+- Una llamada "ingredients", que contiene todos los ingredientes disponibles en la API
 
 Tomando esto en cuenta, la colección que tenemos planeado que sea utilizada es la colección "drinks", ya que las otras solo fueron utilizadas para la creación de las demás (no las eliminamos para demostrar que fue parte del proceso de creación).
 
@@ -132,7 +131,7 @@ use cocktails
 
 1. Obtener las instrucciones de como preparar las 20 bebidas más importantes
     ```javascript
-    db.popular_drinks.find({},{'_id':0, 'idDrink':1, 'strDrink':1, 'strInstructions':1})
+    db.popular_drinks.find({},{'_id':0, 'idDrink':1, 'strDrink':1, 'instructions.EN':1})
     ```
 2. ¿Cuáles son las bebidas que contienen mayor número de ingredientes distintos?
     ```javascript
